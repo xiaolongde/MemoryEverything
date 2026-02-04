@@ -24,6 +24,11 @@ Page({
       wx.removeStorageSync('needRefreshLinks');
       this.refreshLinks();
     }
+
+    // 检查是否有待添加的链接（从剪贴板识别）
+    if (app.globalData.pendingLink) {
+      // app.js 中已经处理了弹窗，这里不需要重复处理
+    }
   },
 
   // 加载链接列表

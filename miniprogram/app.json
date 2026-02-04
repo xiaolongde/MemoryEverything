@@ -49,5 +49,20 @@
   },
   "style": "v2",
   "sitemapLocation": "sitemap.json",
-  "lazyCodeLoading": "requiredComponents"
+  "lazyCodeLoading": "requiredComponents",
+  "permission": {
+    "scope.clipboard": {
+      "desc": "用于读取剪贴板中的链接，快速添加收藏"
+    }
+  },
+  "shortcuts": [
+    {
+      "name": "添加链接",
+      "pagePath": "pages/add-link/add-link"
+    },
+    {
+      "name": "记录感悟",
+      "pagePath": "pages/note-edit/note-edit"
+    }
+  ]
 }
