@@ -1,13 +1,13 @@
 {
   "pages": [
-    "pages/index/index",
-    "pages/notes/notes",
-    "pages/category/category",
+    "pages/timeline/timeline",
+    "pages/organize/organize",
+    "pages/search/search",
     "pages/mine/mine",
     "pages/link-detail/link-detail",
     "pages/note-edit/note-edit",
-    "pages/search/search",
-    "pages/add-link/add-link"
+    "pages/add-link/add-link",
+    "pages/category-detail/category-detail"
   ],
   "window": {
     "backgroundTextStyle": "light",
@@ -22,22 +22,22 @@
     "borderStyle": "black",
     "list": [
       {
-        "pagePath": "pages/index/index",
-        "text": "收藏",
+        "pagePath": "pages/timeline/timeline",
+        "text": "动态",
         "iconPath": "images/tab-home.png",
         "selectedIconPath": "images/tab-home-active.png"
       },
       {
-        "pagePath": "pages/notes/notes",
-        "text": "感悟",
-        "iconPath": "images/tab-note.png",
-        "selectedIconPath": "images/tab-note-active.png"
-      },
-      {
-        "pagePath": "pages/category/category",
-        "text": "分类",
+        "pagePath": "pages/organize/organize",
+        "text": "整理",
         "iconPath": "images/tab-category.png",
         "selectedIconPath": "images/tab-category-active.png"
+      },
+      {
+        "pagePath": "pages/search/search",
+        "text": "搜索",
+        "iconPath": "images/tab-search.png",
+        "selectedIconPath": "images/tab-search-active.png"
       },
       {
         "pagePath": "pages/mine/mine",

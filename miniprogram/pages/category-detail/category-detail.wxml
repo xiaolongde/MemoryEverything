@@ -1,0 +1,26 @@
+<!--pages/category-detail/category-detail.wxml-->
+<view class="page-container">
+  <view class="header">
+    <text class="title">{{title}}</text>
+    <text class="count">共 {{list.length}} 条</text>
+  </view>
+
+  <view class="list" wx:if="{{list.length > 0}}">
+    <view 
+      wx:for="{{list}}" 
+      wx:key="_id"
+      data-item="{{item}}"
+      bindtap="onItemTap"
+    >
+      <link-card link="{{item}}" />
+    </view>
+  </view>
+
+  <view class="empty" wx:if="{{!loading && list.length === 0}}">
+    <text class="empty-text">暂无内容</text>
+  </view>
+
+  <view class="loading" wx:if="{{loading}}">
+    <text>加载中...</text>
+  </view>
+</view>

@@ -1,0 +1,8 @@
+{
+  "usingComponents": {
+    "link-card": "/components/link-card/link-card",
+    "note-card": "/components/note-card/note-card"
+  },
+  "enablePullDownRefresh": true,
+  "navigationBarTitleText": "动态"
+}

@@ -1,0 +1,142 @@
+<!--pages/timeline/timeline.wxml-->
+<!-- 动态页 - 时间线流水账 -->
+
+<view class="page-container">
+  <!-- 顶部搜索栏 -->
+  <view class="search-bar" bindtap="goToSearch">
+    <view class="search-input">
+      <image class="search-icon" src="/images/icon-search.png" mode="aspectFit"></image>
+      <text class="search-placeholder">搜索</text>
+    </view>
+  </view>
+
+  <!-- 时间线列表 -->
+  <view class="timeline-list" wx:if="{{items.length > 0}}">
+    <view 
+      wx:for="{{items}}" 
+      wx:key="_id"
+      class="timeline-item"
+      data-id="{{item._id}}"
+      data-type="{{item.itemType}}"
+      bindtap="{{item.itemType === 'link' ? 'onLinkTap' : 'onNoteTap'}}"
+      bindlongpress="onItemLongPress"
+    >
+      <!-- 链接类型 -->
+      <block wx:if="{{item.itemType === 'link'}}">
+        <view class="item-card link-card">
+          <view class="card-header">
+            <view class="type-badge link">
+              <text>{{item.source === 'wechat_article' ? '📄 公众号' : item.source === 'wechat_video' ? '🎬 视频' : '🔗 链接'}}</text>
+            </view>
+            <text class="time">{{item.displayTime}}</text>
+          </view>
+          
+          <view class="card-body">
+            <view class="link-content">
+              <text class="title">{{item.title || '无标题'}}</text>
+              <text class="desc" wx:if="{{item.description}}">{{item.description}}</text>
+              <text class="url">{{item.url}}</text>
+            </view>
+            <image 
+              wx:if="{{item.thumbnail}}" 
+              class="thumbnail" 
+              src="{{item.thumbnail}}" 
+              mode="aspectFill"
+            ></image>
+          </view>
+
+          <!-- 点评预览 -->
+          <view class="comment-preview" wx:if="{{item.comment && item.comment.content}}">
+            <text class="comment-label">我的点评：</text>
+            <text class="comment-text">{{item.comment.content}}</text>
+          </view>
+
+          <!-- AI 标签（如果有） -->
+          <view class="tags" wx:if="{{item.tags && item.tags.length > 0}}">
+            <text class="tag" wx:for="{{item.tags}}" wx:for-item="tag" wx:key="*this">{{tag}}</text>
+          </view>
+        </view>
+      </block>
+
+      <!-- 感悟类型 -->
+      <block wx:if="{{item.itemType === 'note'}}">
+        <view class="item-card note-card">
+          <view class="card-header">
+            <view class="type-badge note">
+              <text>💭 感悟</text>
+              <text class="mood" wx:if="{{item.mood}}">
+                {{item.mood === 'happy' ? '😊' : item.mood === 'thinking' ? '🤔' : item.mood === 'sad' ? '😢' : item.mood === 'excited' ? '🎉' : '😌'}}
+              </text>
+            </view>
+            <text class="time">{{item.displayTime}}</text>
+          </view>
+          
+          <view class="card-body">
+            <text class="note-content">{{item.content}}</text>
+          </view>
+
+          <!-- 图片 -->
+          <view class="note-images" wx:if="{{item.images && item.images.length > 0}}">
+            <image 
+              wx:for="{{item.images}}" 
+              wx:for-item="img"
+              wx:key="*this"
+              wx:if="{{index < 3}}"
+              class="note-image"
+              src="{{img}}" 
+              mode="aspectFill"
+            ></image>
+            <view class="more-images" wx:if="{{item.images.length > 3}}">
+              +{{item.images.length - 3}}
+            </view>
+          </view>
+
+          <!-- 标签 -->
+          <view class="tags" wx:if="{{item.tags && item.tags.length > 0}}">
+            <text class="tag" wx:for="{{item.tags}}" wx:for-item="tag" wx:key="*this">{{tag}}</text>
+          </view>
+        </view>
+      </block>
+    </view>
+  </view>
+
+  <!-- 空状态 -->
+  <view class="empty-state" wx:if="{{!loading && items.length === 0}}">
+    <image src="/images/empty-link.png" mode="aspectFit"></image>
+    <text class="empty-title">还没有任何记录</text>
+    <text class="empty-hint">点击右下角按钮开始记录</text>
+  </view>
+
+  <!-- 加载状态 -->
+  <view class="loading" wx:if="{{loading && !refreshing}}">
+    <text>加载中...</text>
+  </view>
+
+  <!-- 没有更多 -->
+  <view class="no-more" wx:if="{{!hasMore && items.length > 0}}">
+    <text>没有更多了</text>
+  </view>
+</view>
+
+<!-- 遮罩层 -->
+<view class="mask" wx:if="{{showAddMenu}}" bindtap="hideAddMenu"></view>
+
+<!-- 悬浮添加按钮 -->
+<view class="fab-container">
+  <!-- 展开的菜单 -->
+  <view class="fab-menu {{showAddMenu ? 'show' : ''}}">
+    <view class="fab-menu-item" bindtap="goToAddLink">
+      <text class="fab-menu-icon">🔗</text>
+      <text class="fab-menu-text">添加链接</text>
+    </view>
+    <view class="fab-menu-item" bindtap="goToAddNote">
+      <text class="fab-menu-icon">💭</text>
+      <text class="fab-menu-text">记录感悟</text>
+    </view>
+  </view>
+  
+  <!-- 主按钮 -->
+  <view class="fab-btn {{showAddMenu ? 'active' : ''}}" bindtap="toggleAddMenu">
+    <text class="fab-icon">+</text>
+  </view>
+</view>

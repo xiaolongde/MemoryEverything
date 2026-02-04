@@ -1,0 +1,87 @@
+<!--pages/organize/organize.wxml-->
+<!-- 整理页 - AI 自动分类视图 -->
+
+<view class="page-container">
+  <!-- 统计头部 -->
+  <view class="stats-header">
+    <view class="stats-content">
+      <text class="stats-title">AI 已为你整理</text>
+      <view class="stats-number">
+        <text class="number">{{totalCount}}</text>
+        <text class="unit">条内容</text>
+      </view>
+    </view>
+    <image class="stats-icon" src="/images/icon-ai.png" mode="aspectFit"></image>
+  </view>
+
+  <!-- 待整理提示 -->
+  <view class="pending-section" wx:if="{{pendingCount > 0}}" bindtap="onPendingTap">
+    <view class="pending-info">
+      <text class="pending-icon">⏳</text>
+      <text class="pending-text">{{pendingCount}} 条内容待整理</text>
+    </view>
+    <text class="pending-arrow">›</text>
+  </view>
+
+  <!-- 分类网格 -->
+  <view class="section">
+    <view class="section-header">
+      <text class="section-title">分类</text>
+      <text class="section-count">{{categories.length}} 个</text>
+    </view>
+    
+    <view class="category-grid" wx:if="{{categories.length > 0}}">
+      <view 
+        wx:for="{{categories}}" 
+        wx:key="name"
+        class="category-item"
+        style="background: linear-gradient(135deg, {{item.color}}15, {{item.color}}30);"
+        data-category="{{item.name}}"
+        bindtap="onCategoryTap"
+      >
+        <view class="category-icon" style="background-color: {{item.color}};">
+          <text>{{item.icon}}</text>
+        </view>
+        <view class="category-info">
+          <text class="category-name">{{item.name}}</text>
+          <text class="category-count">{{item.count}} 条</text>
+        </view>
+      </view>
+    </view>
+
+    <view class="empty-tip" wx:if="{{!loading && categories.length === 0}}">
+      <text>暂无分类，添加内容后 AI 会自动分类</text>
+    </view>
+  </view>
+
+  <!-- 标签云 -->
+  <view class="section">
+    <view class="section-header">
+      <text class="section-title">标签</text>
+      <text class="section-count">{{tags.length}} 个</text>
+    </view>
+    
+    <view class="tag-cloud" wx:if="{{tags.length > 0}}">
+      <view 
+        wx:for="{{tags}}" 
+        wx:key="name"
+        class="tag-item"
+        style="font-size: {{item.count > 10 ? 32 : item.count > 5 ? 28 : 26}}rpx;"
+        data-tag="{{item.name}}"
+        bindtap="onTagTap"
+      >
+        <text class="tag-name">{{item.name}}</text>
+        <text class="tag-count">{{item.count}}</text>
+      </view>
+    </view>
+
+    <view class="empty-tip" wx:if="{{!loading && tags.length === 0}}">
+      <text>暂无标签，AI 会自动提取关键词</text>
+    </view>
+  </view>
+
+  <!-- 加载状态 -->
+  <view class="loading" wx:if="{{loading}}">
+    <text>加载中...</text>
+  </view>
+</view>
