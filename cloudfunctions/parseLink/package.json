@@ -1,0 +1,11 @@
+{
+  "name": "parseLink",
+  "version": "1.0.0",
+  "description": "解析链接，提取标题、描述、缩略图",
+  "main": "index.js",
+  "dependencies": {
+    "wx-server-sdk": "~2.6.0",
+    "axios": "^0.27.2",
+    "cheerio": "^1.0.0-rc.12"
+  }
+}

@@ -1,0 +1,44 @@
+<!--pages/notes/notes.wxml-->
+<view class="page-container">
+  <!-- 感悟列表 -->
+  <view class="note-list" wx:if="{{notes.length > 0}}">
+    <view class="timeline">
+      <view 
+        wx:for="{{notes}}" 
+        wx:key="_id"
+        class="timeline-item"
+        data-id="{{item._id}}"
+        data-index="{{index}}"
+        bindtap="goToEdit"
+        bindlongpress="onLongPress"
+      >
+        <view class="timeline-dot"></view>
+        <view class="timeline-content">
+          <note-card note="{{item}}" />
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 空状态 -->
+  <view class="empty-state" wx:if="{{!loading && notes.length === 0}}">
+    <image src="/images/empty-note.png" mode="aspectFit"></image>
+    <text>还没有记录任何感悟</text>
+    <text class="empty-hint">记录下此刻的想法吧</text>
+  </view>
+
+  <!-- 加载状态 -->
+  <view class="loading" wx:if="{{loading}}">
+    <text>加载中...</text>
+  </view>
+
+  <!-- 没有更多 -->
+  <view class="no-more" wx:if="{{!hasMore && notes.length > 0}}">
+    <text>没有更多了</text>
+  </view>
+
+  <!-- 添加按钮 -->
+  <view class="add-btn" bindtap="goToAdd">
+    <image src="/images/icon-edit.png" mode="aspectFit"></image>
+  </view>
+</view>

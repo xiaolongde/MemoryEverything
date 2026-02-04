@@ -1,0 +1,7 @@
+{
+  "usingComponents": {
+    "link-card": "/components/link-card/link-card",
+    "note-card": "/components/note-card/note-card"
+  },
+  "navigationBarTitleText": "搜索"
+}

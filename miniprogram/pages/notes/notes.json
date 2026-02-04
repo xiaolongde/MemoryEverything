@@ -1,0 +1,7 @@
+{
+  "usingComponents": {
+    "note-card": "/components/note-card/note-card"
+  },
+  "enablePullDownRefresh": true,
+  "navigationBarTitleText": "感悟"
+}

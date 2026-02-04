@@ -1,0 +1,83 @@
+<!--pages/note-edit/note-edit.wxml-->
+<view class="page-container">
+  <!-- 内容输入 -->
+  <view class="section">
+    <textarea 
+      class="content-input"
+      placeholder="此刻的想法..."
+      value="{{content}}"
+      bindinput="onContentInput"
+      maxlength="1000"
+      auto-height
+    ></textarea>
+    <text class="char-count">{{content.length}}/1000</text>
+  </view>
+
+  <!-- 图片上传 -->
+  <view class="section">
+    <view class="section-title">图片</view>
+    <view class="image-grid">
+      <view 
+        wx:for="{{images}}" 
+        wx:key="*this"
+        class="image-item"
+      >
+        <image src="{{item}}" mode="aspectFill" data-index="{{index}}" bindtap="previewImage"></image>
+        <view class="remove-btn" data-index="{{index}}" catchtap="removeImage">×</view>
+      </view>
+      <view class="add-image" bindtap="chooseImage" wx:if="{{images.length < 9}}">
+        <text class="add-icon">+</text>
+        <text class="add-text">添加图片</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 心情选择 -->
+  <view class="section">
+    <view class="section-title">心情</view>
+    <view class="mood-list">
+      <view 
+        wx:for="{{moods}}" 
+        wx:key="value"
+        class="mood-item {{mood === item.value ? 'active' : ''}}"
+        data-mood="{{item.value}}"
+        bindtap="onMoodSelect"
+      >
+        <text class="mood-emoji">{{item.emoji}}</text>
+        <text class="mood-label">{{item.label}}</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 标签 -->
+  <view class="section">
+    <view class="section-title">标签</view>
+    <view class="tag-input-row">
+      <input 
+        class="tag-input"
+        placeholder="输入标签"
+        value="{{tagInput}}"
+        bindinput="onTagInput"
+        bindconfirm="addTag"
+      />
+      <view class="add-tag-btn" bindtap="addTag">添加</view>
+    </view>
+    <view class="tag-list" wx:if="{{tags.length > 0}}">
+      <view 
+        wx:for="{{tags}}" 
+        wx:key="*this"
+        class="tag-item"
+      >
+        <text>{{item}}</text>
+        <text class="tag-remove" data-index="{{index}}" catchtap="removeTag">×</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 保存按钮 -->
+  <view class="save-section">
+    <button class="save-btn" bindtap="save" disabled="{{saving}}">
+      {{saving ? '保存中...' : '保存'}}
+    </button>
+  </view>
+</view>

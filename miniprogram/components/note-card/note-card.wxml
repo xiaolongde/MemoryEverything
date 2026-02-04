@@ -1,0 +1,39 @@
+<!--components/note-card/note-card.wxml-->
+<view class="note-card">
+  <!-- 心情和时间 -->
+  <view class="header">
+    <view class="mood" wx:if="{{note.mood}}">
+      <text class="mood-emoji">
+        {{note.mood === 'happy' ? '😊' : note.mood === 'thinking' ? '🤔' : note.mood === 'sad' ? '😢' : note.mood === 'excited' ? '🎉' : '😌'}}
+      </text>
+    </view>
+    <text class="time">{{timeStr}}</text>
+  </view>
+
+  <!-- 内容 -->
+  <view class="content">
+    <text class="text">{{note.content}}</text>
+  </view>
+
+  <!-- 图片 -->
+  <view class="images" wx:if="{{note.images && note.images.length > 0}}">
+    <image 
+      wx:for="{{note.images}}" 
+      wx:key="*this"
+      wx:if="{{index < 3}}"
+      class="image {{note.images.length === 1 ? 'single' : ''}}"
+      src="{{item}}"
+      mode="aspectFill"
+      data-index="{{index}}"
+      catchtap="previewImage"
+    ></image>
+    <view class="more-images" wx:if="{{note.images.length > 3}}">
+      +{{note.images.length - 3}}
+    </view>
+  </view>
+
+  <!-- 标签 -->
+  <view class="tags" wx:if="{{note.tags && note.tags.length > 0}}">
+    <text class="tag" wx:for="{{note.tags}}" wx:key="*this">{{item}}</text>
+  </view>
+</view>

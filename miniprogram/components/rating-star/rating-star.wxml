@@ -1,0 +1,13 @@
+<!--components/rating-star/rating-star.wxml-->
+<view class="rating-star">
+  <view 
+    wx:for="{{[1,2,3,4,5]}}" 
+    wx:key="*this"
+    class="star {{value >= item ? 'active' : ''}} {{readonly ? 'readonly' : ''}}"
+    style="font-size: {{size}}rpx;"
+    data-rating="{{item}}"
+    bindtap="onTap"
+  >
+    {{value >= item ? '★' : '☆'}}
+  </view>
+</view>

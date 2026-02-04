@@ -1,0 +1,93 @@
+/* pages/notes/notes.wxss */
+
+.page-container {
+  min-height: 100vh;
+  padding: 20rpx;
+  padding-bottom: 120rpx;
+}
+
+/* 时间线样式 */
+.timeline {
+  position: relative;
+  padding-left: 40rpx;
+}
+
+.timeline::before {
+  content: '';
+  position: absolute;
+  left: 12rpx;
+  top: 0;
+  bottom: 0;
+  width: 2rpx;
+  background-color: #e8e8e8;
+}
+
+.timeline-item {
+  position: relative;
+  margin-bottom: 30rpx;
+}
+
+.timeline-dot {
+  position: absolute;
+  left: -34rpx;
+  top: 24rpx;
+  width: 16rpx;
+  height: 16rpx;
+  background-color: var(--primary-color);
+  border-radius: 50%;
+  border: 4rpx solid #e6f7ff;
+}
+
+.timeline-content {
+  background-color: #fff;
+  border-radius: 16rpx;
+  overflow: hidden;
+}
+
+/* 空状态 */
+.empty-state {
+  padding-top: 200rpx;
+}
+
+.empty-state image {
+  width: 240rpx;
+  height: 240rpx;
+}
+
+.empty-hint {
+  font-size: 24rpx;
+  color: #bbb;
+  margin-top: 16rpx;
+}
+
+/* 没有更多 */
+.no-more {
+  text-align: center;
+  padding: 30rpx;
+  color: #999;
+  font-size: 24rpx;
+}
+
+/* 添加按钮 */
+.add-btn {
+  position: fixed;
+  right: 40rpx;
+  bottom: 200rpx;
+  width: 100rpx;
+  height: 100rpx;
+  background-color: var(--primary-color);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 6rpx 20rpx rgba(24, 144, 255, 0.4);
+}
+
+.add-btn image {
+  width: 48rpx;
+  height: 48rpx;
+}
+
+.add-btn:active {
+  transform: scale(0.95);
+}

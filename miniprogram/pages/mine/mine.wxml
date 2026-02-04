@@ -1,0 +1,75 @@
+<!--pages/mine/mine.wxml-->
+<view class="page-container">
+  <!-- 用户信息 -->
+  <view class="user-section">
+    <view class="user-info" wx:if="{{userInfo}}">
+      <image class="avatar" src="{{userInfo.avatarUrl}}" mode="aspectFill"></image>
+      <view class="user-detail">
+        <text class="nickname">{{userInfo.nickName}}</text>
+        <text class="desc">记录美好，收藏灵感</text>
+      </view>
+    </view>
+    <view class="user-info" wx:else bindtap="getUserProfile">
+      <view class="avatar-placeholder">
+        <text>👤</text>
+      </view>
+      <view class="user-detail">
+        <text class="nickname">点击登录</text>
+        <text class="desc">登录后同步你的数据</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 数据统计 -->
+  <view class="stats-section">
+    <view class="stat-item">
+      <text class="stat-value">{{stats.linkCount}}</text>
+      <text class="stat-label">链接</text>
+    </view>
+    <view class="stat-divider"></view>
+    <view class="stat-item">
+      <text class="stat-value">{{stats.noteCount}}</text>
+      <text class="stat-label">感悟</text>
+    </view>
+    <view class="stat-divider"></view>
+    <view class="stat-item">
+      <text class="stat-value">{{stats.categoryCount}}</text>
+      <text class="stat-label">分类</text>
+    </view>
+  </view>
+
+  <!-- 功能列表 -->
+  <view class="menu-section">
+    <view class="menu-item" bindtap="exportData">
+      <view class="menu-left">
+        <text class="menu-icon">📤</text>
+        <text class="menu-text">导出数据</text>
+      </view>
+      <text class="menu-arrow">›</text>
+    </view>
+    <view class="menu-item" bindtap="clearCache">
+      <view class="menu-left">
+        <text class="menu-icon">🗑️</text>
+        <text class="menu-text">清除缓存</text>
+      </view>
+      <text class="menu-arrow">›</text>
+    </view>
+  </view>
+
+  <view class="menu-section">
+    <view class="menu-item" bindtap="feedback">
+      <view class="menu-left">
+        <text class="menu-icon">💬</text>
+        <text class="menu-text">意见反馈</text>
+      </view>
+      <text class="menu-arrow">›</text>
+    </view>
+    <view class="menu-item" bindtap="goToAbout">
+      <view class="menu-left">
+        <text class="menu-icon">ℹ️</text>
+        <text class="menu-text">关于</text>
+      </view>
+      <text class="menu-arrow">›</text>
+    </view>
+  </view>
+</view>

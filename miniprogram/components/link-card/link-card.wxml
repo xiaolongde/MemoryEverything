@@ -1,0 +1,34 @@
+<!--components/link-card/link-card.wxml-->
+<view class="link-card">
+  <image 
+    class="thumbnail" 
+    src="{{link.thumbnail || defaultThumbnail}}" 
+    mode="aspectFill"
+    binderror="onImageError"
+  ></image>
+  
+  <view class="content">
+    <text class="title ellipsis-2">{{link.title || '无标题'}}</text>
+    
+    <view class="meta">
+      <text class="source">{{link.source === 'wechat_article' ? '公众号' : link.source === 'wechat_video' ? '视频' : '链接'}}</text>
+      <text class="category" wx:if="{{link.category}}">{{link.category}}</text>
+    </view>
+
+    <!-- 点评预览 -->
+    <view class="comment-preview" wx:if="{{link.comment && link.comment.content}}">
+      <view class="comment-rating" wx:if="{{link.comment.rating}}">
+        <text class="star" wx:for="{{link.comment.rating}}" wx:key="*this">★</text>
+      </view>
+      <text class="comment-text ellipsis">{{link.comment.content}}</text>
+    </view>
+
+    <view class="tags" wx:if="{{link.tags && link.tags.length > 0}}">
+      <text class="tag" wx:for="{{link.tags}}" wx:key="*this" wx:if="{{index < 3}}">{{item}}</text>
+    </view>
+  </view>
+
+  <view class="favorite" wx:if="{{link.isFavorite}}">
+    <text>⭐</text>
+  </view>
+</view>

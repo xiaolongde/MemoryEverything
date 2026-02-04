@@ -1,0 +1,6 @@
+{
+  "usingComponents": {
+    "link-card": "/components/link-card/link-card"
+  },
+  "enablePullDownRefresh": true
+}

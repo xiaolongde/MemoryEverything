@@ -1,0 +1,102 @@
+<!--pages/search/search.wxml-->
+<view class="page-container">
+  <!-- 搜索栏 -->
+  <view class="search-bar">
+    <view class="search-input-wrap">
+      <image class="search-icon" src="/images/icon-search.png" mode="aspectFit"></image>
+      <input 
+        class="search-input"
+        placeholder="搜索链接或感悟"
+        value="{{keyword}}"
+        bindinput="onSearchInput"
+        bindconfirm="doSearch"
+        focus="{{true}}"
+      />
+    </view>
+    <view class="search-btn" bindtap="doSearch">搜索</view>
+  </view>
+
+  <!-- 筛选条件提示 -->
+  <view class="filter-tip" wx:if="{{category || tag}}">
+    <text wx:if="{{category}}">分类：{{category}}</text>
+    <text wx:if="{{tag}}">标签：{{tag}}</text>
+  </view>
+
+  <!-- 搜索历史 -->
+  <view class="history-section" wx:if="{{!searched && historyList.length > 0}}">
+    <view class="history-header">
+      <text class="history-title">搜索历史</text>
+      <text class="history-clear" bindtap="clearHistory">清除</text>
+    </view>
+    <view class="history-list">
+      <view 
+        wx:for="{{historyList}}" 
+        wx:key="*this"
+        class="history-item"
+        data-keyword="{{item}}"
+        bindtap="onHistoryTap"
+      >
+        {{item}}
+      </view>
+    </view>
+  </view>
+
+  <!-- 搜索结果 -->
+  <view class="result-section" wx:if="{{searched}}">
+    <!-- Tab 切换 -->
+    <view class="tabs" wx:if="{{!category && !tag}}">
+      <view 
+        class="tab-item {{activeTab === 'link' ? 'active' : ''}}"
+        data-tab="link"
+        bindtap="switchTab"
+      >
+        链接 ({{links.length}})
+      </view>
+      <view 
+        class="tab-item {{activeTab === 'note' ? 'active' : ''}}"
+        data-tab="note"
+        bindtap="switchTab"
+      >
+        感悟 ({{notes.length}})
+      </view>
+    </view>
+
+    <!-- 加载状态 -->
+    <view class="loading" wx:if="{{loading}}">
+      <text>搜索中...</text>
+    </view>
+
+    <!-- 链接结果 -->
+    <view class="result-list" wx:if="{{!loading && activeTab === 'link'}}">
+      <view wx:if="{{links.length > 0}}">
+        <link-card 
+          wx:for="{{links}}" 
+          wx:key="_id"
+          link="{{item}}"
+          data-id="{{item._id}}"
+          bindtap="goToLinkDetail"
+        />
+      </view>
+      <view class="empty-result" wx:else>
+        <text>未找到相关链接</text>
+      </view>
+    </view>
+
+    <!-- 感悟结果 -->
+    <view class="result-list" wx:if="{{!loading && activeTab === 'note'}}">
+      <view wx:if="{{notes.length > 0}}">
+        <view 
+          wx:for="{{notes}}" 
+          wx:key="_id"
+          data-id="{{item._id}}"
+          bindtap="goToNoteEdit"
+        >
+          <note-card note="{{item}}" />
+        </view>
+      </view>
+      <view class="empty-result" wx:else>
+        <text>未找到相关感悟</text>
+      </view>
+    </view>
+  </view>
+</view>

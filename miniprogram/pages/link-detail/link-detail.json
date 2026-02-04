@@ -1,0 +1,6 @@
+{
+  "usingComponents": {
+    "rating-star": "/components/rating-star/rating-star"
+  },
+  "navigationBarTitleText": "链接详情"
+}

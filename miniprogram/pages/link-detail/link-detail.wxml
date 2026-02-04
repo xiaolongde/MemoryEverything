@@ -1,0 +1,96 @@
+<!--pages/link-detail/link-detail.wxml-->
+<view class="page-container" wx:if="{{!loading && link}}">
+  <!-- 链接信息卡片 -->
+  <view class="link-card">
+    <image 
+      wx:if="{{link.thumbnail}}" 
+      class="thumbnail" 
+      src="{{link.thumbnail}}" 
+      mode="aspectFill"
+    ></image>
+    
+    <view class="link-info">
+      <text class="title">{{link.title || '无标题'}}</text>
+      <text class="description">{{link.description || '暂无描述'}}</text>
+      
+      <view class="meta">
+        <text class="source">{{link.source === 'wechat_article' ? '公众号文章' : link.source === 'wechat_video' ? '微信视频' : '外部链接'}}</text>
+        <text class="time">{{link.createTimeStr}}</text>
+      </view>
+
+      <view class="tags" wx:if="{{link.tags && link.tags.length > 0}}">
+        <text class="tag" wx:for="{{link.tags}}" wx:key="*this">{{item}}</text>
+      </view>
+
+      <view class="category-row" wx:if="{{link.category}}">
+        <text class="label">分类：</text>
+        <text class="category-tag">{{link.category}}</text>
+      </view>
+
+      <view class="summary" wx:if="{{link.summary}}">
+        <text class="label">AI 摘要：</text>
+        <text class="summary-text">{{link.summary}}</text>
+      </view>
+    </view>
+
+    <!-- 操作按钮 -->
+    <view class="actions">
+      <view class="action-btn" bindtap="openLink">
+        <text class="action-icon">📋</text>
+        <text>复制链接</text>
+      </view>
+      <view class="action-btn" bindtap="openInBrowser">
+        <text class="action-icon">🔗</text>
+        <text>打开</text>
+      </view>
+      <view class="action-btn {{link.isFavorite ? 'active' : ''}}" bindtap="toggleFavorite">
+        <text class="action-icon">{{link.isFavorite ? '⭐' : '☆'}}</text>
+        <text>{{link.isFavorite ? '已收藏' : '收藏'}}</text>
+      </view>
+      <view class="action-btn delete" bindtap="deleteLink">
+        <text class="action-icon">🗑️</text>
+        <text>删除</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 点评区域 -->
+  <view class="comment-section">
+    <view class="section-title">我的点评</view>
+    
+    <!-- 评分 -->
+    <view class="rating-row">
+      <text class="label">评分：</text>
+      <view class="rating-stars">
+        <view 
+          wx:for="{{[1,2,3,4,5]}}" 
+          wx:key="*this"
+          class="star {{rating >= item ? 'active' : ''}}"
+          data-rating="{{item}}"
+          bindtap="onRatingChange"
+        >
+          {{rating >= item ? '★' : '☆'}}
+        </view>
+      </view>
+    </view>
+
+    <!-- 点评内容 -->
+    <view class="comment-input-wrap">
+      <textarea 
+        class="comment-input"
+        placeholder="写下你对这个链接的想法..."
+        value="{{commentContent}}"
+        bindinput="onCommentInput"
+        maxlength="500"
+      ></textarea>
+      <text class="char-count">{{commentContent.length}}/500</text>
+    </view>
+
+    <button class="save-btn" bindtap="saveComment">保存点评</button>
+  </view>
+</view>
+
+<!-- 加载状态 -->
+<view class="loading" wx:if="{{loading}}">
+  <text>加载中...</text>
+</view>

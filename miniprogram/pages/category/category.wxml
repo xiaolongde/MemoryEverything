@@ -1,0 +1,53 @@
+<!--pages/category/category.wxml-->
+<view class="page-container">
+  <!-- 分类列表 -->
+  <view class="section">
+    <view class="section-title">分类</view>
+    <view class="category-grid" wx:if="{{categories.length > 0}}">
+      <view 
+        wx:for="{{categories}}" 
+        wx:key="name"
+        class="category-item"
+        style="background-color: {{item.color || '#1890ff'}}20;"
+        data-category="{{item.name}}"
+        bindtap="goToCategoryLinks"
+      >
+        <view class="category-icon" style="background-color: {{item.color || '#1890ff'}};">
+          <text class="iconfont">{{item.icon || '📁'}}</text>
+        </view>
+        <view class="category-info">
+          <text class="category-name">{{item.name}}</text>
+          <text class="category-count">{{item.count || 0}} 个链接</text>
+        </view>
+      </view>
+    </view>
+    <view class="empty-tip" wx:if="{{!loading && categories.length === 0}}">
+      <text>暂无分类</text>
+    </view>
+  </view>
+
+  <!-- 标签云 -->
+  <view class="section">
+    <view class="section-title">标签</view>
+    <view class="tag-cloud" wx:if="{{tags.length > 0}}">
+      <view 
+        wx:for="{{tags}}" 
+        wx:key="name"
+        class="tag-item"
+        style="font-size: {{item.count > 10 ? 32 : item.count > 5 ? 28 : 24}}rpx;"
+        data-tag="{{item.name}}"
+        bindtap="goToTagLinks"
+      >
+        {{item.name}} ({{item.count}})
+      </view>
+    </view>
+    <view class="empty-tip" wx:if="{{!loading && tags.length === 0}}">
+      <text>暂无标签</text>
+    </view>
+  </view>
+
+  <!-- 加载状态 -->
+  <view class="loading" wx:if="{{loading}}">
+    <text>加载中...</text>
+  </view>
+</view>

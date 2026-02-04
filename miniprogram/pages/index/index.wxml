@@ -1,0 +1,60 @@
+<!--pages/index/index.wxml-->
+<view class="page-container">
+  <!-- 搜索栏 -->
+  <view class="search-bar" bindtap="goToSearch">
+    <view class="search-input">
+      <image class="search-icon" src="/images/icon-search.png" mode="aspectFit"></image>
+      <text class="search-placeholder">搜索链接</text>
+    </view>
+  </view>
+
+  <!-- 分类筛选 -->
+  <scroll-view class="category-scroll" scroll-x>
+    <view class="category-list">
+      <view 
+        wx:for="{{categories}}" 
+        wx:key="*this"
+        class="category-item {{currentCategory === item ? 'active' : ''}}"
+        data-category="{{item}}"
+        bindtap="onCategoryChange"
+      >
+        {{item}}
+      </view>
+    </view>
+  </scroll-view>
+
+  <!-- 链接列表 -->
+  <view class="link-list" wx:if="{{links.length > 0}}">
+    <link-card 
+      wx:for="{{links}}" 
+      wx:key="_id"
+      link="{{item}}"
+      data-id="{{item._id}}"
+      data-index="{{index}}"
+      bindtap="goToDetail"
+      bindlongpress="onLongPress"
+    />
+  </view>
+
+  <!-- 空状态 -->
+  <view class="empty-state" wx:if="{{!loading && links.length === 0}}">
+    <image src="/images/empty-link.png" mode="aspectFit"></image>
+    <text>还没有收藏任何链接</text>
+    <text class="empty-hint">点击右下角按钮添加</text>
+  </view>
+
+  <!-- 加载状态 -->
+  <view class="loading" wx:if="{{loading}}">
+    <text>加载中...</text>
+  </view>
+
+  <!-- 没有更多 -->
+  <view class="no-more" wx:if="{{!hasMore && links.length > 0}}">
+    <text>没有更多了</text>
+  </view>
+
+  <!-- 添加按钮 -->
+  <view class="add-btn" bindtap="goToAddLink">
+    <image src="/images/icon-add.png" mode="aspectFit"></image>
+  </view>
+</view>

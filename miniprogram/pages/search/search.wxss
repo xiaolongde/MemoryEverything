@@ -1,0 +1,146 @@
+/* pages/search/search.wxss */
+
+.page-container {
+  min-height: 100vh;
+  background-color: #f5f5f5;
+}
+
+/* 搜索栏 */
+.search-bar {
+  display: flex;
+  align-items: center;
+  padding: 20rpx;
+  background-color: #fff;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.search-input-wrap {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  background-color: #f5f5f5;
+  border-radius: 36rpx;
+  padding: 16rpx 24rpx;
+}
+
+.search-icon {
+  width: 32rpx;
+  height: 32rpx;
+  margin-right: 16rpx;
+}
+
+.search-input {
+  flex: 1;
+  font-size: 28rpx;
+}
+
+.search-btn {
+  margin-left: 20rpx;
+  padding: 16rpx 32rpx;
+  background-color: var(--primary-color);
+  color: #fff;
+  border-radius: 36rpx;
+  font-size: 28rpx;
+}
+
+/* 筛选条件提示 */
+.filter-tip {
+  padding: 16rpx 20rpx;
+  background-color: var(--primary-light);
+  color: var(--primary-color);
+  font-size: 26rpx;
+}
+
+/* 搜索历史 */
+.history-section {
+  padding: 20rpx;
+  background-color: #fff;
+  margin-top: 20rpx;
+}
+
+.history-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20rpx;
+}
+
+.history-title {
+  font-size: 28rpx;
+  color: #333;
+  font-weight: 500;
+}
+
+.history-clear {
+  font-size: 24rpx;
+  color: #999;
+}
+
+.history-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16rpx;
+}
+
+.history-item {
+  padding: 12rpx 24rpx;
+  background-color: #f5f5f5;
+  border-radius: 30rpx;
+  font-size: 26rpx;
+  color: #666;
+}
+
+/* Tab 切换 */
+.tabs {
+  display: flex;
+  background-color: #fff;
+  margin-top: 20rpx;
+  border-bottom: 1rpx solid #f0f0f0;
+}
+
+.tab-item {
+  flex: 1;
+  text-align: center;
+  padding: 24rpx 0;
+  font-size: 28rpx;
+  color: #666;
+  position: relative;
+}
+
+.tab-item.active {
+  color: var(--primary-color);
+  font-weight: 500;
+}
+
+.tab-item.active::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 60rpx;
+  height: 4rpx;
+  background-color: var(--primary-color);
+  border-radius: 2rpx;
+}
+
+/* 搜索结果 */
+.result-list {
+  padding: 20rpx;
+}
+
+.empty-result {
+  text-align: center;
+  padding: 100rpx;
+  color: #999;
+  font-size: 28rpx;
+}
+
+/* 加载状态 */
+.loading {
+  text-align: center;
+  padding: 60rpx;
+  color: #999;
+}

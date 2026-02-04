@@ -1,0 +1,20 @@
+/* components/rating-star/rating-star.wxss */
+
+.rating-star {
+  display: flex;
+  align-items: center;
+}
+
+.star {
+  color: #ddd;
+  margin-right: 8rpx;
+  transition: all 0.2s;
+}
+
+.star.active {
+  color: #faad14;
+}
+
+.star:not(.readonly):active {
+  transform: scale(1.2);
+}

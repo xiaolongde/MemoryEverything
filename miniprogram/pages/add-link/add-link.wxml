@@ -1,0 +1,78 @@
+<!--pages/add-link/add-link.wxml-->
+<view class="page-container">
+  <!-- URL 输入 -->
+  <view class="section">
+    <view class="section-title">链接地址</view>
+    <view class="url-input-wrap">
+      <input 
+        class="url-input"
+        placeholder="请输入或粘贴链接"
+        value="{{url}}"
+        bindinput="onUrlInput"
+        bindconfirm="parseLink"
+      />
+      <view class="paste-btn" bindtap="pasteUrl">粘贴</view>
+    </view>
+    <view class="parse-btn" bindtap="parseLink">
+      {{parsing ? '解析中...' : '自动解析'}}
+    </view>
+  </view>
+
+  <!-- 链接信息 -->
+  <view class="section">
+    <view class="section-title">链接信息</view>
+    
+    <view class="form-item">
+      <text class="label">标题</text>
+      <input 
+        class="input"
+        placeholder="链接标题"
+        value="{{title}}"
+        bindinput="onTitleInput"
+      />
+    </view>
+
+    <view class="form-item">
+      <text class="label">描述</text>
+      <textarea 
+        class="textarea"
+        placeholder="链接描述（可选）"
+        value="{{description}}"
+        bindinput="onDescInput"
+        maxlength="200"
+      ></textarea>
+    </view>
+
+    <view class="form-item">
+      <text class="label">分类</text>
+      <picker 
+        mode="selector" 
+        range="{{categories}}"
+        bindchange="onCategoryChange"
+      >
+        <view class="picker">
+          {{category || '选择分类（可选）'}}
+          <text class="picker-arrow">›</text>
+        </view>
+      </picker>
+    </view>
+  </view>
+
+  <!-- AI 分类设置 -->
+  <view class="section ai-section">
+    <view class="ai-row">
+      <view class="ai-info">
+        <text class="ai-title">AI 智能分类</text>
+        <text class="ai-desc">自动分析内容并分类、提取标签</text>
+      </view>
+      <switch checked="{{useAI}}" bindchange="onAISwitchChange" color="#1890ff" />
+    </view>
+  </view>
+
+  <!-- 保存按钮 -->
+  <view class="save-section">
+    <button class="save-btn" bindtap="save" disabled="{{saving}}">
+      {{saving ? '保存中...' : '保存'}}
+    </button>
+  </view>
+</view>
