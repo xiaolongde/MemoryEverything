@@ -54,16 +54,11 @@ Page({
   // 获取统计数据
   async getStats() {
     try {
-      const db = wx.cloud.database();
-      const totalRes = await db.collection('links').count();
-      // 待处理：没有分类的链接
-      const pendingRes = await db.collection('links')
-        .where({ category: '' })
-        .count();
-      
+      const { get } = require('../../utils/request');
+      const res = await get('/links/stats');
       return {
-        total: totalRes.total || 0,
-        pending: pendingRes.total || 0
+        total: res.total || 0,
+        pending: res.pending || 0
       };
     } catch (err) {
       return { total: 0, pending: 0 };

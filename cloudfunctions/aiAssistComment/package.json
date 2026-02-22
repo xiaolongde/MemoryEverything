@@ -1,0 +1,10 @@
+{
+  "name": "aiAssistComment",
+  "version": "1.0.0",
+  "description": "AI 辅助点评，根据 AI 解读生成点评建议",
+  "main": "index.js",
+  "dependencies": {
+    "wx-server-sdk": "~2.6.0",
+    "axios": "^0.27.2"
+  }
+}

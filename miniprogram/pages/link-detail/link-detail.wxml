@@ -54,9 +54,107 @@
     </view>
   </view>
 
+  <!-- AI 深度解读区域 -->
+  <view class="ai-insight-section">
+    <view class="section-header">
+      <text class="section-title">🤖 AI 深度解读</text>
+      <view
+        wx:if="{{!link.aiInsight && !generatingInsight}}"
+        class="generate-btn"
+        bindtap="generateInsight"
+      >
+        <text class="generate-icon">✨</text>
+        <text>生成解读</text>
+      </view>
+    </view>
+
+    <!-- 生成中状态 -->
+    <view wx:if="{{generatingInsight}}" class="insight-loading">
+      <text class="loading-icon">⏳</text>
+      <text class="loading-text">AI 正在深度分析中...</text>
+    </view>
+
+    <!-- AI 解读内容 -->
+    <view wx:if="{{link.aiInsight && !generatingInsight}}" class="insight-content">
+      <!-- 核心观点 -->
+      <view wx:if="{{link.aiInsight.keyPoints && link.aiInsight.keyPoints.length > 0}}" class="insight-block">
+        <view class="block-title">📝 核心观点</view>
+        <view class="key-points">
+          <view
+            wx:for="{{link.aiInsight.keyPoints}}"
+            wx:key="index"
+            class="key-point-item"
+          >
+            <view class="point-header">
+              <text class="point-number">{{index + 1}}</text>
+              <text class="point-title">{{item.title}}</text>
+            </view>
+            <text class="point-content">{{item.content}}</text>
+          </view>
+        </view>
+      </view>
+
+      <!-- 深度洞察 -->
+      <view wx:if="{{link.aiInsight.insights}}" class="insight-block">
+        <view class="block-title">💡 深度洞察</view>
+        <view class="insights-grid">
+          <view wx:if="{{link.aiInsight.insights.value}}" class="insight-item">
+            <text class="insight-label">核心价值</text>
+            <text class="insight-text">{{link.aiInsight.insights.value}}</text>
+          </view>
+          <view wx:if="{{link.aiInsight.insights.inspiration}}" class="insight-item">
+            <text class="insight-label">启发思考</text>
+            <text class="insight-text">{{link.aiInsight.insights.inspiration}}</text>
+          </view>
+          <view wx:if="{{link.aiInsight.insights.application}}" class="insight-item">
+            <text class="insight-label">应用场景</text>
+            <text class="insight-text">{{link.aiInsight.insights.application}}</text>
+          </view>
+          <view wx:if="{{link.aiInsight.insights.connection}}" class="insight-item">
+            <text class="insight-label">知识关联</text>
+            <text class="insight-text">{{link.aiInsight.insights.connection}}</text>
+          </view>
+        </view>
+      </view>
+
+      <!-- 思考问题 -->
+      <view wx:if="{{link.aiInsight.questions && link.aiInsight.questions.length > 0}}" class="insight-block">
+        <view class="block-title">🤔 思考问题</view>
+        <view class="questions-list">
+          <view
+            wx:for="{{link.aiInsight.questions}}"
+            wx:key="index"
+            class="question-item"
+            data-question="{{item}}"
+            bindtap="onQuestionTap"
+          >
+            <text class="question-icon">💭</text>
+            <text class="question-text">{{item}}</text>
+          </view>
+        </view>
+        <view class="tip-text">💡 点击问题可快速添加到点评中</view>
+      </view>
+
+      <!-- 降级提示 -->
+      <view wx:if="{{link.aiInsight.modelVersion === 'fallback'}}" class="fallback-tip">
+        <text>⚠️ AI 服务暂时不可用，以上为基础分析</text>
+      </view>
+    </view>
+  </view>
+
   <!-- 点评区域 -->
   <view class="comment-section">
-    <view class="section-title">我的点评</view>
+    <view class="section-header">
+      <text class="section-title">我的点评</text>
+      <view
+        wx:if="{{link.aiInsight && !loadingSuggestions}}"
+        class="assist-btn"
+        bindtap="getCommentSuggestions"
+      >
+        <text class="assist-icon">✨</text>
+        <text>AI 辅助</text>
+      </view>
+    </view>
     
     <!-- 评分 -->
     <view class="rating-row">
@@ -87,6 +185,46 @@
     </view>
 
     <button class="save-btn" bindtap="saveComment">保存点评</button>
+
+    <!-- AI 点评建议弹窗 -->
+    <view wx:if="{{showSuggestions}}" class="suggestions-modal" catchtap="closeSuggestions">
+      <view class="suggestions-content" catchtap="stopPropagation">
+        <view class="modal-header">
+          <text class="modal-title">💡 AI 点评建议</text>
+          <text class="close-btn" bindtap="closeSuggestions">✕</text>
+        </view>
+
+        <!-- 加载中 -->
+        <view wx:if="{{loadingSuggestions}}" class="suggestions-loading">
+          <text class="loading-icon">⏳</text>
+          <text class="loading-text">AI 正在生成建议...</text>
+        </view>
+
+        <!-- 建议列表 -->
+        <view wx:if="{{!loadingSuggestions && commentSuggestions.length > 0}}" class="suggestions-list">
+          <view
+            wx:for="{{commentSuggestions}}"
+            wx:key="index"
+            class="suggestion-card"
+            data-content="{{item.content}}"
+            bindtap="selectSuggestion"
+          >
+            <view class="suggestion-header">
+              <text class="suggestion-icon">{{item.icon}}</text>
+              <text class="suggestion-angle">{{item.angle}}</text>
+            </view>
+            <text class="suggestion-content">{{item.content}}</text>
+            <view class="suggestion-action">
+              <text class="action-text">点击使用此建议</text>
+            </view>
+          </view>
+
+          <view wx:if="{{suggestionsFallback}}" class="fallback-tip">
+            <text>⚠️ AI 服务暂时不可用，以上为基础建议</text>
+          </view>
+        </view>
+      </view>
+    </view>
   </view>
 </view>
 

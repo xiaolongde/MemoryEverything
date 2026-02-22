@@ -1,5 +1,6 @@
 // pages/note-edit/note-edit.js
 const noteService = require('../../services/note');
+const { uploadFile } = require('../../utils/request');
 
 Page({
   data: {
@@ -137,24 +138,23 @@ Page({
     this.setData({ images });
   },
 
-  // 上传图片到云存储
+  // 上传图片到服务器
   async uploadImages(localImages) {
     const uploadedImages = [];
 
     for (const path of localImages) {
-      // 如果已经是云存储路径，跳过
-      if (path.startsWith('cloud://')) {
+      // 如果已经是服务器路径，跳过
+      if (path.startsWith('http://') || path.startsWith('https://')) {
         uploadedImages.push(path);
         continue;
       }
 
       try {
-        const cloudPath = `notes/${Date.now()}_${Math.random().toString(36).substr(2)}.jpg`;
-        const res = await wx.cloud.uploadFile({
-          cloudPath,
-          filePath: path
+        const res = await uploadFile('/upload/image', {
+          filePath: path,
+          name: 'file'
         });
-        uploadedImages.push(res.fileID);
+        uploadedImages.push(res.url);
       } catch (err) {
         console.error('上传图片失败：', err);
       }

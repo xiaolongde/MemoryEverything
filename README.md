@@ -4,12 +4,19 @@
 
 ## 功能特性
 
+### 核心功能
 - 📥 **链接收藏** - 保存分享的链接，自动抓取标题/描述/缩略图
 - 🤖 **AI 智能分类** - 自动分析内容并分类、提取标签
 - 💬 **链接点评** - 对收藏的链接添加个人点评和评分
 - 💭 **感悟记录** - 记录日常感悟短文，支持图片和心情
 - 🔍 **全文搜索** - 搜索链接和感悟内容
 - ☁️ **多端同步** - 云端存储，多设备数据同步
+
+### ✨ AI 深度解读功能（新）
+- 🧠 **AI 深度解读** - 提取核心观点、深度洞察、思考引导问题
+- ✍️ **AI 辅助点评** - 3 种角度的智能点评建议（实践应用、个人成长、深度思考）
+- 💡 **思考问题快捷添加** - 点击思考问题快速添加到点评
+- 🔄 **智能缓存机制** - 自动缓存 AI 解读结果，避免重复调用
 
 ## 项目结构
 
@@ -18,7 +25,9 @@ MemoryEverything/
 ├── cloudfunctions/           # 云函数
 │   ├── getOpenid/            # 获取用户 openid
 │   ├── parseLink/            # 链接解析
-│   └── aiClassify/           # AI 智能分类
+│   ├── aiClassify/           # AI 智能分类
+│   ├── aiInsight/            # AI 深度解读（新）
+│   └── aiAssistComment/      # AI 辅助点评（新）
 │
 ├── miniprogram/              # 小程序主体
 │   ├── pages/                # 页面
@@ -77,13 +86,20 @@ cd MemoryEverything
 - `notes` - 感悟数据
 - `categories` - 分类数据（可选）
 
-### 6. 配置 AI 分类（可选）
+### 6. 配置 AI 功能（可选）
 
-如需启用 AI 智能分类功能：
+如需启用完整的 AI 功能（智能分类、深度解读、辅助点评）：
 
 1. 申请通义千问 API Key：https://dashscope.aliyuncs.com/
-2. 修改 `cloudfunctions/aiClassify/index.js` 中的 `AI_CONFIG.QWEN_API_KEY`
-3. 重新部署 aiClassify 云函数
+2. 修改以下云函数中的 `AI_CONFIG.QWEN_API_KEY`：
+   - `cloudfunctions/aiClassify/index.js`（AI 智能分类）
+   - `cloudfunctions/aiInsight/index.js`（AI 深度解读）
+   - `cloudfunctions/aiAssistComment/index.js`（AI 辅助点评）
+3. 重新部署这些云函数
+
+**注意**：如不配置 API Key，系统会自动使用降级方案，仍然可以正常使用（但 AI 能力会受限）。
+
+详细部署指南请查看 [DEPLOYMENT.md](./DEPLOYMENT.md)
 
 ## 图片资源
 

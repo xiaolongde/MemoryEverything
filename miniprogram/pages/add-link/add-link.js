@@ -1,5 +1,6 @@
 // pages/add-link/add-link.js
 const linkService = require('../../services/link');
+const { post } = require('../../utils/request');
 
 Page({
   data: {
@@ -64,13 +65,10 @@ Page({
     this.setData({ parsing: true });
 
     try {
-      const res = await wx.cloud.callFunction({
-        name: 'parseLink',
-        data: { url }
-      });
+      const res = await post('/links/parse', { url });
 
-      if (res.result && res.result.success) {
-        const { title, description, thumbnail, source } = res.result.data;
+      if (res && res.success) {
+        const { title, description, thumbnail, source } = res.data;
         this.setData({
           title: title || '',
           description: description || '',

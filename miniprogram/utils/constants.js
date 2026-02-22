@@ -40,8 +40,7 @@ const LINK_SOURCES = {
 
 // API 配置
 const API_CONFIG = {
-  AI_CLASSIFY_URL: '', // AI 分类 API 地址
-  AI_API_KEY: ''       // AI API Key
+  BASE_URL: 'http://124.220.61.92',  // 后台服务器地址
 };
 
 module.exports = {

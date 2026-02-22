@@ -1,21 +1,13 @@
 // services/note.js
 // 感悟相关服务
 
-const db = wx.cloud.database();
-const _ = db.command;
+const { get, post, put, del } = require('../utils/request');
 
 /**
  * 获取感悟列表
  */
 async function getNotes({ page = 1, pageSize = 20 }) {
-  const skip = (page - 1) * pageSize;
-  
-  const res = await db.collection('notes')
-    .orderBy('createTime', 'desc')
-    .skip(skip)
-    .limit(pageSize)
-    .get();
-  
+  const res = await get('/notes', { page, pageSize });
   return res;
 }
 
@@ -23,7 +15,7 @@ async function getNotes({ page = 1, pageSize = 20 }) {
  * 根据 ID 获取感悟详情
  */
 async function getNoteById(id) {
-  const res = await db.collection('notes').doc(id).get();
+  const res = await get(`/notes/${id}`);
   return res;
 }
 
@@ -31,14 +23,7 @@ async function getNoteById(id) {
  * 添加感悟
  */
 async function addNote(noteData) {
-  const res = await db.collection('notes').add({
-    data: {
-      ...noteData,
-      createTime: db.serverDate(),
-      updateTime: db.serverDate()
-    }
-  });
-  
+  const res = await post('/notes', noteData);
   return res;
 }
 
@@ -46,12 +31,7 @@ async function addNote(noteData) {
  * 更新感悟
  */
 async function updateNote(id, data) {
-  const res = await db.collection('notes').doc(id).update({
-    data: {
-      ...data,
-      updateTime: db.serverDate()
-    }
-  });
+  const res = await put(`/notes/${id}`, data);
   return res;
 }
 
@@ -59,7 +39,7 @@ async function updateNote(id, data) {
  * 删除感悟
  */
 async function deleteNote(id) {
-  const res = await db.collection('notes').doc(id).remove();
+  const res = await del(`/notes/${id}`);
   return res;
 }
 
@@ -67,15 +47,7 @@ async function deleteNote(id) {
  * 搜索感悟
  */
 async function searchNotes(keyword) {
-  const res = await db.collection('notes')
-    .where(_.or([
-      { content: db.RegExp({ regexp: keyword, options: 'i' }) },
-      { tags: db.RegExp({ regexp: keyword, options: 'i' }) }
-    ]))
-    .orderBy('createTime', 'desc')
-    .limit(50)
-    .get();
-  
+  const res = await get('/notes/search', { keyword });
   return res;
 }
 

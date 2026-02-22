@@ -1,22 +1,13 @@
 // services/link.js
 // 链接相关服务
 
-const db = wx.cloud.database();
-const _ = db.command;
+const { get, post, put, del } = require('../utils/request');
 
 /**
  * 获取链接列表
  */
 async function getLinks({ category = '', page = 1, pageSize = 20 }) {
-  const skip = (page - 1) * pageSize;
-  
-  let query = db.collection('links').orderBy('createTime', 'desc');
-  
-  if (category) {
-    query = query.where({ category });
-  }
-  
-  const res = await query.skip(skip).limit(pageSize).get();
+  const res = await get('/links', { category, page, pageSize });
   return res;
 }
 
@@ -24,7 +15,7 @@ async function getLinks({ category = '', page = 1, pageSize = 20 }) {
  * 根据 ID 获取链接详情
  */
 async function getLinkById(id) {
-  const res = await db.collection('links').doc(id).get();
+  const res = await get(`/links/${id}`);
   return res;
 }
 
@@ -32,41 +23,7 @@ async function getLinkById(id) {
  * 添加链接
  */
 async function addLink(linkData) {
-  // 如果开启了 AI 分类，调用云函数
-  if (linkData.useAI) {
-    try {
-      const aiRes = await wx.cloud.callFunction({
-        name: 'aiClassify',
-        data: {
-          title: linkData.title,
-          description: linkData.description,
-          url: linkData.url
-        }
-      });
-      
-      if (aiRes.result && aiRes.result.success) {
-        const { category, tags, summary } = aiRes.result.data;
-        linkData.category = linkData.category || category;
-        linkData.tags = tags || [];
-        linkData.summary = summary || '';
-      }
-    } catch (err) {
-      console.error('AI 分类失败：', err);
-    }
-  }
-
-  delete linkData.useAI;
-  
-  const res = await db.collection('links').add({
-    data: {
-      ...linkData,
-      isRead: false,
-      isFavorite: false,
-      createTime: db.serverDate(),
-      updateTime: db.serverDate()
-    }
-  });
-  
+  const res = await post('/links', linkData);
   return res;
 }
 
@@ -74,12 +31,7 @@ async function addLink(linkData) {
  * 更新链接
  */
 async function updateLink(id, data) {
-  const res = await db.collection('links').doc(id).update({
-    data: {
-      ...data,
-      updateTime: db.serverDate()
-    }
-  });
+  const res = await put(`/links/${id}`, data);
   return res;
 }
 
@@ -87,7 +39,7 @@ async function updateLink(id, data) {
  * 删除链接
  */
 async function deleteLink(id) {
-  const res = await db.collection('links').doc(id).remove();
+  const res = await del(`/links/${id}`);
   return res;
 }
 
@@ -95,16 +47,7 @@ async function deleteLink(id) {
  * 搜索链接
  */
 async function searchLinks(keyword) {
-  const res = await db.collection('links')
-    .where(_.or([
-      { title: db.RegExp({ regexp: keyword, options: 'i' }) },
-      { description: db.RegExp({ regexp: keyword, options: 'i' }) },
-      { tags: db.RegExp({ regexp: keyword, options: 'i' }) }
-    ]))
-    .orderBy('createTime', 'desc')
-    .limit(50)
-    .get();
-  
+  const res = await get('/links/search', { keyword });
   return res;
 }
 
@@ -112,12 +55,7 @@ async function searchLinks(keyword) {
  * 按分类获取链接
  */
 async function getLinksByCategory(category) {
-  const res = await db.collection('links')
-    .where({ category })
-    .orderBy('createTime', 'desc')
-    .limit(100)
-    .get();
-  
+  const res = await get('/links', { category, pageSize: 100 });
   return res;
 }
 
@@ -125,12 +63,7 @@ async function getLinksByCategory(category) {
  * 按标签获取链接
  */
 async function getLinksByTag(tag) {
-  const res = await db.collection('links')
-    .where({ tags: tag })
-    .orderBy('createTime', 'desc')
-    .limit(100)
-    .get();
-  
+  const res = await get('/links', { tag, pageSize: 100 });
   return res;
 }
 

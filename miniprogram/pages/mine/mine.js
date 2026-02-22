@@ -1,5 +1,6 @@
 // pages/mine/mine.js
 const app = getApp();
+const { get } = require('../../utils/request');
 
 Page({
   data: {
@@ -35,24 +36,16 @@ Page({
   // 加载统计数据
   async loadStats() {
     try {
-      const db = wx.cloud.database();
-      const _ = db.command;
-      
-      const [linkRes, noteRes, categoryRes] = await Promise.all([
-        db.collection('links').count(),
-        db.collection('notes').count(),
-        db.collection('categories').count()
-      ]);
-
+      const res = await get('/stats');
       this.setData({
         stats: {
-          linkCount: linkRes.total || 0,
-          noteCount: noteRes.total || 0,
-          categoryCount: categoryRes.total || 0
+          linkCount: res.linkCount || 0,
+          noteCount: res.noteCount || 0,
+          categoryCount: res.categoryCount || 0
         }
       });
     } catch (err) {
-      console.error('加载统计失败：', err);
+      console.warn('加载统计失败：', err.message || err);
     }
   },
 
@@ -75,7 +68,7 @@ Page({
   clearCache() {
     wx.showModal({
       title: '清除缓存',
-      content: '确定要清除本地缓存吗？云端数据不会被删除。',
+      content: '确定要清除本地缓存吗？服务器数据不会被删除。',
       success: (res) => {
         if (res.confirm) {
           wx.clearStorageSync();

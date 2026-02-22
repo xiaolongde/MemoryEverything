@@ -1,0 +1,10 @@
+{
+  "name": "aiInsight",
+  "version": "1.0.0",
+  "description": "AI 深度解读，提取核心观点、深度洞察和思考问题",
+  "main": "index.js",
+  "dependencies": {
+    "wx-server-sdk": "~2.6.0",
+    "axios": "^0.27.2"
+  }
+}

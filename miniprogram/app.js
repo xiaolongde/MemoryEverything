@@ -1,4 +1,6 @@
 // app.js
+const { post } = require('./utils/request');
+
 App({
   globalData: {
     userInfo: null,
@@ -9,18 +11,8 @@ App({
   },
 
   onLaunch() {
-    // 初始化云开发
-    if (!wx.cloud) {
-      console.error('请使用 2.2.3 或以上的基础库以使用云能力');
-    } else {
-      wx.cloud.init({
-        env: 'your-env-id', // 替换为你的云开发环境 ID
-        traceUser: true
-      });
-    }
-
-    // 获取用户 openid
-    this.getOpenid();
+    // 登录获取 openid
+    this.login();
   },
 
   // 每次小程序显示时检测剪贴板
@@ -83,28 +75,31 @@ App({
     return url.substring(0, maxLength) + '...';
   },
 
-  // 获取用户 openid
-  async getOpenid() {
+  // 登录：使用 wx.login 获取 code，发送给后台换取 openid 和 token
+  async login() {
     // 先从缓存获取
+    const token = wx.getStorageSync('token');
     const openid = wx.getStorageSync('openid');
-    if (openid) {
+    if (token && openid) {
       this.globalData.openid = openid;
       this.globalData.isLogin = true;
       return openid;
     }
 
     try {
-      const res = await wx.cloud.callFunction({
-        name: 'getOpenid'
-      });
-      if (res.result && res.result.openid) {
-        this.globalData.openid = res.result.openid;
+      const loginRes = await wx.login();
+      const res = await post('/auth/login', { code: loginRes.code });
+      if (res.openid) {
+        this.globalData.openid = res.openid;
         this.globalData.isLogin = true;
-        wx.setStorageSync('openid', res.result.openid);
-        return res.result.openid;
+        wx.setStorageSync('openid', res.openid);
+        if (res.token) {
+          wx.setStorageSync('token', res.token);
+        }
+        return res.openid;
       }
     } catch (err) {
-      console.error('获取 openid 失败：', err);
+      console.error('登录失败：', err);
     }
     return null;
   },

@@ -1,6 +1,8 @@
 // pages/category-detail/category-detail.js
 // 分类详情页 - 显示某分类或标签下的所有内容
 
+const linkService = require('../../services/link');
+
 Page({
   data: {
     title: '',
@@ -39,23 +41,19 @@ Page({
     this.setData({ loading: true });
 
     try {
-      const db = wx.cloud.database();
-      const _ = db.command;
-      let query = {};
+      let res;
 
       if (this.data.isPending) {
-        query = { category: '' };
+        res = await linkService.getLinks({ category: '', pageSize: 50 });
+        // 过滤出没有分类的链接
+        res.data = (res.data || []).filter(item => !item.category);
       } else if (this.data.category) {
-        query = { category: this.data.category };
+        res = await linkService.getLinksByCategory(this.data.category);
       } else if (this.data.tag) {
-        query = { tags: _.elemMatch(_.eq(this.data.tag)) };
+        res = await linkService.getLinksByTag(this.data.tag);
+      } else {
+        res = { data: [] };
       }
-
-      const res = await db.collection('links')
-        .where(query)
-        .orderBy('createTime', 'desc')
-        .limit(50)
-        .get();
 
       this.setData({
         list: res.data || []

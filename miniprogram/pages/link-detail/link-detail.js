@@ -1,5 +1,6 @@
 // pages/link-detail/link-detail.js
 const linkService = require('../../services/link');
+const { post } = require('../../utils/request');
 const { formatTime } = require('../../utils/format');
 
 Page({
@@ -7,7 +8,12 @@ Page({
     link: null,
     loading: true,
     commentContent: '',
-    rating: 0
+    rating: 0,
+    generatingInsight: false,  // 是否正在生成 AI 解读
+    showSuggestions: false,    // 是否显示点评建议弹窗
+    loadingSuggestions: false, // 是否正在加载建议
+    commentSuggestions: [],    // AI 点评建议列表
+    suggestionsFallback: false // 是否使用降级建议
   },
 
   onLoad(options) {
@@ -157,6 +163,146 @@ Page({
         }
       }
     });
+  },
+
+  // 生成 AI 深度解读
+  async generateInsight() {
+    const { link } = this.data;
+    if (!link || this.data.generatingInsight) return;
+
+    this.setData({ generatingInsight: true });
+
+    try {
+      const res = await post('/ai/insight', {
+        linkId: link._id,
+        title: link.title,
+        description: link.description,
+        summary: link.summary,
+        url: link.url
+      });
+
+      if (res && res.success) {
+        // 更新 link 数据
+        this.setData({
+          'link.aiInsight': res.data
+        });
+
+        wx.showToast({
+          title: res.fallback ? '生成成功（降级）' : '生成成功',
+          icon: 'success'
+        });
+
+        // 标记需要刷新列表
+        wx.setStorageSync('needRefreshTimeline', true);
+      } else {
+        throw new Error('生成失败');
+      }
+    } catch (err) {
+      console.error('生成 AI 解读失败：', err);
+      wx.showToast({
+        title: '生成失败，请重试',
+        icon: 'none'
+      });
+    } finally {
+      this.setData({ generatingInsight: false });
+    }
+  },
+
+  // 点击思考问题
+  onQuestionTap(e) {
+    const question = e.currentTarget.dataset.question;
+    if (!question) return;
+
+    const currentComment = this.data.commentContent;
+    const newComment = currentComment
+      ? `${currentComment}\n\n${question}\n`
+      : `${question}\n`;
+
+    this.setData({ commentContent: newComment });
+
+    wx.showToast({
+      title: '已添加到点评',
+      icon: 'success',
+      duration: 1500
+    });
+
+    // 滚动到点评区域
+    wx.pageScrollTo({
+      selector: '.comment-section',
+      duration: 300
+    });
+  },
+
+  // 获取 AI 点评建议
+  async getCommentSuggestions() {
+    const { link, commentContent } = this.data;
+    if (!link || this.data.loadingSuggestions) return;
+
+    this.setData({
+      showSuggestions: true,
+      loadingSuggestions: true,
+      commentSuggestions: [],
+      suggestionsFallback: false
+    });
+
+    try {
+      const res = await post('/ai/assist-comment', {
+        title: link.title,
+        aiInsight: link.aiInsight,
+        userInput: commentContent
+      });
+
+      if (res && res.success) {
+        this.setData({
+          commentSuggestions: res.data.suggestions || [],
+          suggestionsFallback: res.fallback || false
+        });
+      } else {
+        throw new Error('获取建议失败');
+      }
+    } catch (err) {
+      console.error('获取 AI 点评建议失败：', err);
+      wx.showToast({
+        title: '获取建议失败',
+        icon: 'none'
+      });
+      this.closeSuggestions();
+    } finally {
+      this.setData({ loadingSuggestions: false });
+    }
+  },
+
+  // 选择点评建议
+  selectSuggestion(e) {
+    const content = e.currentTarget.dataset.content;
+    if (!content) return;
+
+    this.setData({
+      commentContent: content,
+      showSuggestions: false
+    });
+
+    wx.showToast({
+      title: '已应用建议',
+      icon: 'success',
+      duration: 1500
+    });
+
+    // 滚动到点评输入框
+    wx.pageScrollTo({
+      selector: '.comment-input',
+      duration: 300
+    });
+  },
+
+  // 关闭建议弹窗
+  closeSuggestions() {
+    this.setData({ showSuggestions: false });
+  },
+
+  // 阻止冒泡
+  stopPropagation() {
+    // 空函数，用于阻止事件冒泡
   },
 
   // 分享
