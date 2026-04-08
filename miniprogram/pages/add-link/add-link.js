@@ -1,6 +1,5 @@
 // pages/add-link/add-link.js
 const linkService = require('../../services/link');
-const { post } = require('../../utils/request');
 
 Page({
   data: {
@@ -65,19 +64,31 @@ Page({
     this.setData({ parsing: true });
 
     try {
-      const res = await post('/links/parse', { url });
+      // 本地模式：简单提取域名作为标题
+      const urlObj = url.match(/^https?:\/\/([^\/]+)/);
+      const domain = urlObj ? urlObj[1] : '';
 
-      if (res && res.success) {
-        const { title, description, thumbnail, source } = res.data;
-        this.setData({
-          title: title || '',
-          description: description || '',
-          thumbnail: thumbnail || '',
-          source: source || 'external'
-        });
-      } else {
-        wx.showToast({ title: '解析失败，请手动输入', icon: 'none' });
+      // 判断来源
+      let source = 'external';
+      if (url.includes('mp.weixin.qq.com')) {
+        source = 'wechat_article';
+      } else if (
+        url.includes('channels.weixin.qq.com') ||
+        url.includes('finder.video.qq.com') ||
+        (url.includes('weixin.qq.com') && url.includes('video'))
+      ) {
+        source = 'wechat_video';
       }
+
+      this.setData({
+        title: domain ? `来自 ${domain} 的${source === 'wechat_video' ? '视频' : '链接'}` : '',
+        source
+      });
+
+      wx.showToast({
+        title: source === 'wechat_video' ? '检测到视频号链接' : '请手动填写标题',
+        icon: 'none'
+      });
     } catch (err) {
       console.error('解析链接失败：', err);
       wx.showToast({ title: '解析失败', icon: 'none' });
