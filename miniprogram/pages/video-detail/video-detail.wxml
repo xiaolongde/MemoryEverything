@@ -1,0 +1,126 @@
+<!--pages/video-detail/video-detail.wxml-->
+<view class="page-container" wx:if="{{!loading && video}}">
+  <!-- 视频卡片 -->
+  <view class="video-card">
+    <view class="thumb-wrap" bindtap="openOriginal">
+      <image
+        class="thumb"
+        src="{{video.thumbnail || '/images/default-thumbnail.png'}}"
+        mode="aspectFill"
+      ></image>
+      <view class="play-overlay">
+        <text class="play-btn">▶</text>
+        <text class="play-hint">打开原视频</text>
+      </view>
+    </view>
+
+    <view class="video-info">
+      <text class="video-title">{{video.title || '无标题'}}</text>
+      <view class="video-meta-row">
+        <text wx:if="{{video.videoAuthor}}" class="author">{{video.videoAuthor}}</text>
+        <text class="time">{{video.createTimeStr}}</text>
+      </view>
+      <text wx:if="{{video.description}}" class="video-desc">{{video.description}}</text>
+    </view>
+
+    <view class="category-section">
+      <picker
+        mode="selector"
+        range="{{categories}}"
+        bindchange="onCategoryChange"
+      >
+        <view class="category-picker">
+          <text class="category-label">分类</text>
+          <text class="category-value">{{video.category || '点击选择'}}</text>
+          <text class="picker-arrow">›</text>
+        </view>
+      </picker>
+      <view wx:if="{{video.tags && video.tags.length > 0}}" class="tags-row">
+        <text class="tag" wx:for="{{video.tags}}" wx:key="*this">{{item}}</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 要点卡片 -->
+  <view class="keypoints-card">
+    <view class="section-header">
+      <text class="section-title">要点提取</text>
+      <view
+        class="extract-btn {{extracting ? 'extracting' : ''}}"
+        bindtap="extractKeyPoints"
+      >
+        <text>{{video.keyPoints ? '重新提取' : '提取要点'}}</text>
+      </view>
+    </view>
+
+    <view wx:if="{{extracting}}" class="extracting-state">
+      <text class="extracting-text">AI 正在分析视频内容...</text>
+    </view>
+
+    <view wx:if="{{video.keyPoints && !extracting}}" class="keypoints-content">
+      <view class="summary-block">
+        <text class="summary-text">{{video.keyPoints.summary}}</text>
+      </view>
+      <view wx:if="{{video.keyPoints.points && video.keyPoints.points.length > 0}}" class="points-list">
+        <view
+          class="point-item"
+          wx:for="{{video.keyPoints.points}}"
+          wx:key="index"
+        >
+          <text class="point-num">{{index + 1}}</text>
+          <text class="point-text">{{item}}</text>
+        </view>
+      </view>
+    </view>
+
+    <view wx:if="{{!video.keyPoints && !extracting}}" class="no-keypoints">
+      <text class="no-keypoints-text">点击上方按钮，AI 帮你提取核心要点</text>
+    </view>
+  </view>
+
+  <!-- 点评区域 -->
+  <view class="comment-card">
+    <text class="section-title">我的点评</text>
+
+    <view class="rating-row">
+      <text class="rating-label">评分</text>
+      <view class="rating-stars">
+        <view
+          wx:for="{{[1,2,3,4,5]}}"
+          wx:key="*this"
+          class="star {{rating >= item ? 'active' : ''}}"
+          data-rating="{{item}}"
+          bindtap="onRatingChange"
+        >{{rating >= item ? '★' : '☆'}}</view>
+      </view>
+    </view>
+
+    <view class="comment-input-wrap">
+      <textarea
+        class="comment-input"
+        placeholder="写下你的想法..."
+        placeholderClass="comment-placeholder"
+        value="{{commentContent}}"
+        bindinput="onCommentInput"
+        maxlength="500"
+      ></textarea>
+      <text class="char-count">{{commentContent.length}}/500</text>
+    </view>
+
+    <view class="comment-btn" bindtap="saveComment">保存点评</view>
+  </view>
+
+  <!-- 底部操作栏 -->
+  <view class="bottom-bar">
+    <view class="bar-btn primary" bindtap="openOriginal">
+      <text>打开原视频</text>
+    </view>
+    <view class="bar-btn danger" bindtap="deleteVideo">
+      <text>删除</text>
+    </view>
+  </view>
+</view>
+
+<view class="loading-state" wx:if="{{loading}}">
+  <text class="loading-text">加载中...</text>
+</view>
