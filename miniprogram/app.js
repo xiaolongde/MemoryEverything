@@ -11,8 +11,8 @@ App({
   },
 
   onLaunch() {
-    // 登录获取 openid
-    this.login();
+    // 本地模式，无需登录
+    console.log('记忆万物已启动（本地存储模式）');
   },
 
   // 每次小程序显示时检测剪贴板
@@ -36,15 +36,19 @@ App({
         this.globalData.lastClipboard = content;
         this.globalData.pendingLink = content;
         
+        // 判断是否是视频号链接
+        const isVideo = content.includes('channels.weixin.qq.com') ||
+          content.includes('finder.video.qq.com') ||
+          (content.includes('weixin.qq.com') && content.includes('video'));
+
         // 弹窗提示用户
         wx.showModal({
-          title: '检测到链接',
+          title: isVideo ? '检测到视频号链接' : '检测到链接',
           content: this.truncateUrl(content),
           confirmText: '立即添加',
           cancelText: '忽略',
           success: (modalRes) => {
             if (modalRes.confirm) {
-              // 跳转到添加页面
               wx.navigateTo({
                 url: `/pages/add-link/add-link?url=${encodeURIComponent(content)}`
               });

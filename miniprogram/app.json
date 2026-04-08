@@ -7,6 +7,8 @@
     "pages/link-detail/link-detail",
     "pages/note-edit/note-edit",
     "pages/add-link/add-link",
+    "pages/video-list/video-list",
+    "pages/video-detail/video-detail",
     "pages/category-detail/category-detail"
   ],
   "window": {
