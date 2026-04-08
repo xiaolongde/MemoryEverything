@@ -154,6 +154,105 @@ function generateFallbackInsight(title, description) {
 }
 
 /**
+ * POST /ai/extract-points
+ * 提取视频要点（一句话摘要 + 详细要点列表）
+ */
+router.post('/extract-points', async (req, res) => {
+  try {
+    const { linkId } = req.body;
+    if (!linkId) {
+      return res.status(400).json({ success: false, message: '缺少 linkId' });
+    }
+
+    const db = getDB();
+    const link = db.prepare('SELECT * FROM links WHERE id = ? AND user_id = ?')
+      .get(linkId, req.userId);
+
+    if (!link) {
+      return res.status(404).json({ success: false, message: '链接不存在' });
+    }
+
+    const aiApiUrl = process.env.AI_API_URL;
+    const aiApiKey = process.env.AI_API_KEY;
+
+    let keyPointsData;
+
+    if (aiApiUrl && aiApiKey) {
+      try {
+        const axios = require('axios');
+        const isVideo = link.source === 'wechat_video';
+        const contentType = isVideo ? '视频号短视频' : '链接内容';
+
+        const aiRes = await axios.post(aiApiUrl, {
+          model: 'gpt-3.5-turbo',
+          messages: [
+            {
+              role: 'system',
+              content: `你是一个内容分析助手。请从${contentType}信息中提取要点。返回严格的 JSON 格式，不要包含其他内容。`
+            },
+            {
+              role: 'user',
+              content: `请分析以下${contentType}：
+标题：${link.title}
+描述：${link.description}
+分类：${link.category || '未分类'}
+${link.video_author ? '作者：' + link.video_author : ''}
+
+请返回以下 JSON 格式：
+{
+  "summary": "一句话摘要（不超过50字）",
+  "points": ["要点1", "要点2", "要点3"]
+}
+
+要求：
+- summary 是一句话概括核心内容
+- points 是 3-5 个具体的知识点或关键步骤
+- 如果是教程类内容，提取具体步骤
+- 如果是知识类内容，提取核心观点`
+            }
+          ]
+        }, {
+          headers: {
+            'Authorization': `Bearer ${aiApiKey}`,
+            'Content-Type': 'application/json'
+          },
+          timeout: 30000
+        });
+
+        const content = aiRes.data.choices?.[0]?.message?.content || '';
+        try {
+          const match = content.match(/\{[\s\S]*\}/);
+          keyPointsData = match ? JSON.parse(match[0]) : generateFallbackKeyPoints(link.title, link.description);
+        } catch {
+          keyPointsData = generateFallbackKeyPoints(link.title, link.description);
+        }
+      } catch (aiErr) {
+        console.error('AI 要点提取失败，使用降级方案：', aiErr.message);
+        keyPointsData = generateFallbackKeyPoints(link.title, link.description);
+      }
+    } else {
+      keyPointsData = generateFallbackKeyPoints(link.title, link.description);
+    }
+
+    // 添加提取时间
+    keyPointsData.extracted_at = new Date().toISOString();
+
+    // 保存到数据库
+    db.prepare('UPDATE links SET key_points = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ? AND user_id = ?')
+      .run(JSON.stringify(keyPointsData), linkId, req.userId);
+
+    res.json({
+      success: true,
+      data: keyPointsData,
+      fallback: !aiApiUrl || !aiApiKey
+    });
+  } catch (err) {
+    console.error('提取要点失败：', err);
+    res.status(500).json({ success: false, message: '提取失败' });
+  }
+});
+
+/**
  * 降级方案：生成点评建议
  */
 function generateFallbackSuggestions(title) {
@@ -162,6 +261,19 @@ function generateFallbackSuggestions(title) {
     `读完「${title}」后，我认为其中的方法论可以应用到日常工作中，特别是在提升效率方面。`,
     `「${title}」提出了一些独特的视角，虽然有些观点我还需要进一步验证，但整体启发很大。`
   ];
+}
+
+/**
+ * 降级方案：生成简单要点
+ */
+function generateFallbackKeyPoints(title, description) {
+  const desc = description || '';
+  return {
+    summary: desc ? desc.substring(0, 50) : `关于「${title || '未知内容'}」的短视频`,
+    points: desc
+      ? desc.split(/[。！？\n]/).filter(s => s.trim().length > 5).slice(0, 3).map(s => s.trim())
+      : [`这个视频讨论了「${title || '未知主题'}」相关内容`]
+  };
 }
 
 /**
