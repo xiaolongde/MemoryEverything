@@ -38,8 +38,27 @@
     </view>
   </view>
 
+  <!-- 视频收藏入口 -->
+  <view class="menu-section">
+    <view class="menu-item" bindtap="goVideoList">
+      <view class="menu-left">
+        <text class="menu-icon">🎬</text>
+        <text class="menu-text">视频收藏</text>
+      </view>
+      <text class="menu-arrow">›</text>
+    </view>
+  </view>
+
   <!-- 功能列表 -->
   <view class="menu-section">
+    <view class="menu-item" bindtap="syncToServer">
+      <view class="menu-left">
+        <text class="menu-icon">☁️</text>
+        <text class="menu-text">同步到服务器</text>
+      </view>
+      <text class="menu-arrow" wx:if="{{!syncing}}">›</text>
+      <text class="menu-desc" wx:else>同步中...</text>
+    </view>
     <view class="menu-item" bindtap="exportData">
       <view class="menu-left">
         <text class="menu-icon">📤</text>

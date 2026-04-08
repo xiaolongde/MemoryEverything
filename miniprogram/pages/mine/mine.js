@@ -1,6 +1,6 @@
 // pages/mine/mine.js
 const app = getApp();
-const { get } = require('../../utils/request');
+const localDb = require('../../utils/localDb');
 
 Page({
   data: {
@@ -10,7 +10,8 @@ Page({
       noteCount: 0,
       categoryCount: 0
     },
-    isLogin: false
+    isLogin: false,
+    syncing: false
   },
 
   onLoad() {
@@ -34,19 +35,15 @@ Page({
   },
 
   // 加载统计数据
-  async loadStats() {
-    try {
-      const res = await get('/stats');
-      this.setData({
-        stats: {
-          linkCount: res.linkCount || 0,
-          noteCount: res.noteCount || 0,
-          categoryCount: res.categoryCount || 0
-        }
-      });
-    } catch (err) {
-      console.warn('加载统计失败：', err.message || err);
-    }
+  loadStats() {
+    const stats = localDb.getStats();
+    this.setData({
+      stats: {
+        linkCount: stats.linkCount || 0,
+        noteCount: stats.noteCount || 0,
+        categoryCount: stats.categoryCount || 0
+      }
+    });
   },
 
   // 获取用户信息
@@ -68,14 +65,43 @@ Page({
   clearCache() {
     wx.showModal({
       title: '清除缓存',
-      content: '确定要清除本地缓存吗？服务器数据不会被删除。',
+      content: '确定要清除本地缓存吗？注意：本地数据将被清除，请先同步到服务器。',
       success: (res) => {
         if (res.confirm) {
           wx.clearStorageSync();
+          this.loadStats();
           wx.showToast({ title: '缓存已清除', icon: 'success' });
         }
       }
     });
+  },
+
+  // 一键同步到服务器
+  async syncToServer() {
+    if (this.data.syncing) return;
+    this.setData({ syncing: true });
+    wx.showLoading({ title: '同步中...' });
+
+    try {
+      const { syncToServer } = require('../../services/sync');
+      const result = await syncToServer();
+
+      wx.hideLoading();
+      wx.showModal({
+        title: result.success ? '同步完成' : '同步结果',
+        content: result.message,
+        showCancel: false
+      });
+    } catch (err) {
+      wx.hideLoading();
+      wx.showModal({
+        title: '同步失败',
+        content: err.message || '请检查服务器地址和网络连接',
+        showCancel: false
+      });
+    } finally {
+      this.setData({ syncing: false });
+    }
   },
 
   // 导出数据
@@ -83,6 +109,13 @@ Page({
     wx.showToast({
       title: '功能开发中',
       icon: 'none'
+    });
+  },
+
+  // 跳转到视频收藏
+  goVideoList() {
+    wx.navigateTo({
+      url: '/pages/video-list/video-list'
     });
   },
 
