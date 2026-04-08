@@ -1,0 +1,61 @@
+<!--pages/video-list/video-list.wxml-->
+<view class="page-container">
+  <!-- 分类筛选 -->
+  <scroll-view class="category-bar" scroll-x enable-flex>
+    <view
+      wx:for="{{categories}}"
+      wx:key="*this"
+      class="category-pill {{(item === '全部' && !activeCategory) || item === activeCategory ? 'active' : ''}}"
+      data-category="{{item}}"
+      bindtap="onCategoryTap"
+    >{{item}}</view>
+  </scroll-view>
+
+  <!-- 视频列表 -->
+  <view class="video-list" wx:if="{{videos.length > 0}}">
+    <view
+      class="video-card"
+      wx:for="{{videos}}"
+      wx:key="_id"
+      data-id="{{item._id}}"
+      bindtap="onVideoTap"
+    >
+      <view class="video-thumb-wrap">
+        <image
+          class="video-thumb"
+          src="{{item.thumbnail || '/images/default-thumbnail.png'}}"
+          mode="aspectFill"
+        ></image>
+        <view class="play-icon">▶</view>
+      </view>
+      <view class="video-info">
+        <text class="video-title ellipsis-2">{{item.title || '无标题'}}</text>
+        <text wx:if="{{item.videoAuthor}}" class="video-author">{{item.videoAuthor}}</text>
+        <view class="video-meta">
+          <text wx:if="{{item.category}}" class="video-category">{{item.category}}</text>
+        </view>
+        <text wx:if="{{item.keyPoints && item.keyPoints.summary}}" class="video-summary ellipsis">
+          {{item.keyPoints.summary}}
+        </text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 空状态 -->
+  <view class="empty-state" wx:if="{{!loading && videos.length === 0}}">
+    <text class="empty-icon">🎬</text>
+    <text class="empty-text">还没收藏视频</text>
+    <text class="empty-hint">去视频号分享试试</text>
+    <view class="empty-btn" bindtap="goAdd">去添加</view>
+  </view>
+
+  <!-- 加载状态 -->
+  <view class="loading-bar" wx:if="{{loading}}">
+    <text>加载中...</text>
+  </view>
+
+  <!-- 没有更多 -->
+  <view class="no-more" wx:if="{{!hasMore && videos.length > 0 && !loading}}">
+    <text>没有更多了</text>
+  </view>
+</view>
