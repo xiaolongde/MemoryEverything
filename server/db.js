@@ -77,6 +77,18 @@ function initDB() {
     CREATE INDEX IF NOT EXISTS idx_notes_created ON notes(user_id, created_at DESC);
   `);
 
+  // 兼容旧数据库：添加视频相关字段
+  const columns = db.prepare("PRAGMA table_info(links)").all().map(c => c.name);
+  if (!columns.includes('video_author')) {
+    db.exec("ALTER TABLE links ADD COLUMN video_author TEXT DEFAULT ''");
+  }
+  if (!columns.includes('video_duration')) {
+    db.exec("ALTER TABLE links ADD COLUMN video_duration INTEGER DEFAULT 0");
+  }
+  if (!columns.includes('key_points')) {
+    db.exec("ALTER TABLE links ADD COLUMN key_points TEXT DEFAULT ''");
+  }
+
   console.log('✅ 数据库初始化完成');
 }
 

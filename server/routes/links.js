@@ -124,15 +124,26 @@ router.post('/parse', async (req, res) => {
 
     // 判断来源
     let source = 'external';
+    let videoAuthor = '';
+    let videoDuration = 0;
+
     if (url.includes('mp.weixin.qq.com')) {
       source = 'wechat_article';
-    } else if (url.includes('weixin.qq.com') && url.includes('video')) {
+    } else if (
+      url.includes('channels.weixin.qq.com') ||
+      url.includes('finder.video.qq.com') ||
+      (url.includes('weixin.qq.com') && url.includes('video'))
+    ) {
       source = 'wechat_video';
+      videoAuthor = $('meta[property="og:article:author"]').attr('content') ||
+        $('meta[name="author"]').attr('content') ||
+        $('.author-name').text().trim() ||
+        $('.nickname').text().trim() || '';
     }
 
     res.json({
       success: true,
-      data: { title, description, thumbnail, source }
+      data: { title, description, thumbnail, source, videoAuthor, videoDuration }
     });
   } catch (err) {
     console.error('解析链接失败：', err.message);
@@ -169,15 +180,15 @@ router.post('/', (req, res) => {
   try {
     const db = getDB();
     const userId = req.userId;
-    const { url, title, description, thumbnail, source, category, tags, summary, useAI } = req.body;
+    const { url, title, description, thumbnail, source, category, tags, summary, useAI, videoAuthor, videoDuration } = req.body;
 
     if (!url) {
       return res.status(400).json({ message: '缺少 url' });
     }
 
     const result = db.prepare(`
-      INSERT INTO links (user_id, url, title, description, thumbnail, source, category, tags, summary)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+      INSERT INTO links (user_id, url, title, description, thumbnail, source, category, tags, summary, video_author, video_duration)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `).run(
       userId,
       url,
@@ -187,7 +198,9 @@ router.post('/', (req, res) => {
       source || 'external',
       category || '',
       JSON.stringify(tags || []),
-      summary || ''
+      summary || '',
+      videoAuthor || '',
+      videoDuration || 0
     );
 
     res.json({
@@ -222,7 +235,7 @@ router.put('/:id', (req, res) => {
     const params = [];
 
     // 动态构建 UPDATE 语句
-    const allowedFields = ['title', 'description', 'category', 'summary', 'is_read', 'is_favorite', 'thumbnail', 'source'];
+    const allowedFields = ['title', 'description', 'category', 'summary', 'is_read', 'is_favorite', 'thumbnail', 'source', 'video_author', 'video_duration'];
     for (const field of allowedFields) {
       // 前端字段名映射：isRead -> is_read, isFavorite -> is_favorite
       const frontKey = field.replace(/_([a-z])/g, (_, c) => c.toUpperCase());
@@ -245,6 +258,12 @@ router.put('/:id', (req, res) => {
     if (data.comment !== undefined) {
       updates.push('comment = ?');
       params.push(JSON.stringify(data.comment));
+    }
+
+    // key_points 特殊处理（对象 → JSON 字符串）
+    if (data.keyPoints !== undefined) {
+      updates.push('key_points = ?');
+      params.push(JSON.stringify(data.keyPoints));
     }
 
     // ai_insight 特殊处理
@@ -305,6 +324,9 @@ function formatLink(row) {
     isFavorite: !!row.is_favorite,
     comment: safeParseJSON(row.comment, null),
     aiInsight: safeParseJSON(row.ai_insight, null),
+    videoAuthor: row.video_author || '',
+    videoDuration: row.video_duration || 0,
+    keyPoints: safeParseJSON(row.key_points, null),
     createTime: row.created_at,
     updateTime: row.updated_at
   };
