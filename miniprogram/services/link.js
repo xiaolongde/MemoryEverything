@@ -1,70 +1,65 @@
 // services/link.js
-// 链接相关服务
+// 链接相关服务（本地存储）
 
-const { get, post, put, del } = require('../utils/request');
+const localDb = require('../utils/localDb');
 
-/**
- * 获取链接列表
- */
-async function getLinks({ category = '', page = 1, pageSize = 20 }) {
-  const res = await get('/links', { category, page, pageSize });
-  return res;
+async function getLinks({ category = '', tag = '', page = 1, pageSize = 20 } = {}) {
+  return localDb.getLinks({ category, tag, page, pageSize });
 }
 
-/**
- * 根据 ID 获取链接详情
- */
 async function getLinkById(id) {
-  const res = await get(`/links/${id}`);
-  return res;
+  return localDb.getLinkById(id);
 }
 
-/**
- * 添加链接
- */
 async function addLink(linkData) {
-  const res = await post('/links', linkData);
-  return res;
+  return localDb.addLink(linkData);
 }
 
-/**
- * 更新链接
- */
 async function updateLink(id, data) {
-  const res = await put(`/links/${id}`, data);
-  return res;
+  return localDb.updateLink(id, data);
 }
 
-/**
- * 删除链接
- */
 async function deleteLink(id) {
-  const res = await del(`/links/${id}`);
-  return res;
+  return localDb.deleteLink(id);
 }
 
-/**
- * 搜索链接
- */
 async function searchLinks(keyword) {
-  const res = await get('/links/search', { keyword });
-  return res;
+  return localDb.searchLinks(keyword);
 }
 
-/**
- * 按分类获取链接
- */
 async function getLinksByCategory(category) {
-  const res = await get('/links', { category, pageSize: 100 });
-  return res;
+  return localDb.getLinks({ category, pageSize: 100 });
+}
+
+async function getLinksByTag(tag) {
+  return localDb.getLinks({ tag, pageSize: 100 });
 }
 
 /**
- * 按标签获取链接
+ * 获取视频列表
  */
-async function getLinksByTag(tag) {
-  const res = await get('/links', { tag, pageSize: 100 });
-  return res;
+function getVideoLinks(params = {}) {
+  return localDb.getVideoLinks(params);
+}
+
+/**
+ * 提取视频要点（本地降级方案）
+ */
+function extractKeyPoints(linkId) {
+  const { data: link } = localDb.getLinkById(linkId);
+  if (!link) return { success: false };
+
+  const desc = link.description || '';
+  const keyPoints = {
+    summary: desc ? desc.substring(0, 50) : `关于「${link.title || '未知内容'}」的短视频`,
+    points: desc
+      ? desc.split(/[。！？\n]/).filter(s => s.trim().length > 5).slice(0, 3).map(s => s.trim())
+      : [`这个视频讨论了「${link.title || '未知主题'}」相关内容`],
+    extracted_at: new Date().toISOString()
+  };
+
+  localDb.updateLink(linkId, { keyPoints });
+  return { success: true, data: keyPoints };
 }
 
 module.exports = {
@@ -75,5 +70,7 @@ module.exports = {
   deleteLink,
   searchLinks,
   getLinksByCategory,
-  getLinksByTag
+  getLinksByTag,
+  getVideoLinks,
+  extractKeyPoints
 };
