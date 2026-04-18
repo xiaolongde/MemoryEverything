@@ -1,5 +1,9 @@
 ---
 tags: [design, video]
+status: done
+project: MemoryEverything
+type: design
+updated: 2026-04-08
 ---
 
 # 短视频收藏 + AI 分类 + 要点提取
